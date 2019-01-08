@@ -1,5 +1,3 @@
-import util from 'util'
-
 globals = @
 
 RESERVED_FIELDS = ['document', 'parent', 'schema', 'migrations']
