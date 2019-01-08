@@ -695,6 +695,7 @@ class globals.Document
       @_sourceFieldUpdated isGenerator, id, name, value
 
   @_setupSourceObservers: (updateAll) ->
+    observingQuery = @Meta.observingQuery or {}
     for [fields, isGenerator] in [[@Meta.fields, false], [@Meta.generators, true]]
       do (fields, isGenerator) =>
         return if _.isEmpty fields
@@ -760,7 +761,7 @@ class globals.Document
             observers.changed = globals.Document._observerCallback false, (id, fields) =>
               @_sourceUpdated isGenerator, id, fields
 
-          handle = @Meta.collection.find({}, fields: sourceFields).observeChanges observers
+          handle = @Meta.collection.find(observingQuery, fields: sourceFields).observeChanges observers
 
           initializing = false
 
@@ -778,7 +779,7 @@ class globals.Document
             observers.changed = globals.Document._observerCallback true, (id, fields) =>
               @_sourceUpdated isGenerator, id, fields
 
-          handle = @Meta.collection.find({}, fields: sourceFieldsLimitedToPrefix).observeChanges observers
+          handle = @Meta.collection.find(observingQuery, fields: sourceFieldsLimitedToPrefix).observeChanges observers
 
           initializingLimitedToPrefix = false
 
@@ -922,11 +923,12 @@ class globals.Document._ObservingField extends globals.Document._Field
 
 class globals.Document._TargetedFieldsObservingField extends globals.Document._ObservingField
   # Arguments:
-  #   targetDocument, fields
-  constructor: (targetDocument, @fields) ->
+  #   targetDocument, fields, observingQuery
+  constructor: (targetDocument, @fields, @observingQuery) ->
     super()
 
     @fields ?= []
+    @observingQuery ?= {}
 
     if targetDocument is 'self'
       @targetDocument = 'self'
@@ -984,7 +986,7 @@ class globals.Document._TargetedFieldsObservingField extends globals.Document._O
         @removeSource id
 
     referenceFields = fieldsToProjection @fields
-    handle = @targetCollection.find({}, fields: referenceFields).observeChanges observers
+    handle = @targetCollection.find(@observingQuery, fields: referenceFields).observeChanges observers
 
     initializing = false
 
@@ -994,10 +996,11 @@ class globals.Document._ReferenceField extends globals.Document._TargetedFieldsO
   # Arguments:
   #   targetDocument, fields
   #   targetDocument, fields, required
-  #   targetDocument, fields, required, reverseName
-  #   targetDocument, fields, required, reverseName, reverseFields
-  constructor: (targetDocument, fields, @required, @reverseName, @reverseFields) ->
-    super targetDocument, fields
+  #   targetDocument, fields, required, observingQuery
+  #   targetDocument, fields, required, observingQuery, reverseName
+  #   targetDocument, fields, required, observingQuery, reverseName, reverseFields
+  constructor: (targetDocument, fields, observingQuery, @required, @reverseName, @reverseFields) ->
+    super targetDocument, fields, observingQuery
 
     @required ?= true
     @reverseName ?= null
@@ -1226,10 +1229,9 @@ class globals.Document._ReferenceField extends globals.Document._TargetedFieldsO
 
 class globals.Document._GeneratedField extends globals.Document._TargetedFieldsObservingField
   # Arguments:
-  #   targetDocument, fields
-  #   targetDocument, fields, generator
-  constructor: (targetDocument, fields, @generator) ->
-    super targetDocument, fields
+  #   targetDocument, fields, observableQuery, generator
+  constructor: (targetDocument, fields, observableQuery, @generator) ->
+    super targetDocument, fields, observableQuery
 
   _updateSourceField: (id, fields) =>
     [selector, sourceValue] = @generator fields
