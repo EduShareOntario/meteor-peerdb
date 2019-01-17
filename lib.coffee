@@ -1227,9 +1227,9 @@ class globals.Document._ReferenceField extends globals.Document._TargetedFieldsO
 
 class globals.Document._GeneratedField extends globals.Document._TargetedFieldsObservingField
   # Arguments:
-  #   targetDocument, fields, observableQuery, generator
-  constructor: (targetDocument, fields, observableQuery, @generator) ->
-    super targetDocument, fields, observableQuery
+  #   targetDocument, fields, observingQuery, generator
+  constructor: (targetDocument, fields, observingQuery, @generator) ->
+    super targetDocument, fields, observingQuery
 
   _updateSourceField: (id, fields) =>
     [selector, sourceValue] = @generator fields
