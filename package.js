@@ -1,8 +1,8 @@
 Package.describe({
-  name: 'peerlibrary:peerdb',
-  summary: "Reactive database layer with references, generators, triggers, migrations, etc.",
-  version: '0.26.0',
-  git: 'https://github.com/peerlibrary/meteor-peerdb.git'
+  name: 'edushareontario:peerdb',
+  summary: "Reactive database layer with references, generators, triggers, migrations, etc. (observing tweak)",
+  version: '0.27.1',
+  git: 'https://github.com/edushareontario/meteor-peerdb.git'
 });
 
 Package.onUse(function (api) {
@@ -62,7 +62,7 @@ Package.onTest(function (api) {
 
   // Internal dependencies.
   api.use([
-    'peerlibrary:peerdb'
+    'edushareontario:peerdb'
   ]);
 
   // 3rd party dependencies.
